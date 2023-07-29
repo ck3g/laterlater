@@ -18,9 +18,20 @@ func main() {
 
 	apiKey := os.Getenv("API_KEY")
 	videoAPI := video.NewYouTubeAPI(apiKey)
-	videos, err := videoAPI.GetInfo(context.Background(), []string{"FNnckb4rg5o", "CK5rLpZk5A8", "WQKPIOvt2Ac"})
+
+	repo, err := video.NewFileRepository("tmp/videos.txt")
 	if err != nil {
-		fmt.Printf("error getting video info: %w", err)
+		fmt.Println("error initializing video repository")
+	}
+
+	ids, err := repo.GetAll(context.Background())
+	if err != nil {
+		fmt.Printf("error fetching video IDs: %w\n", err)
+	}
+
+	videos, err := videoAPI.GetInfo(context.Background(), ids)
+	if err != nil {
+		fmt.Printf("error getting video info: %w\n", err)
 	}
 
 	fmt.Println("# Videos")
