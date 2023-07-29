@@ -21,29 +21,33 @@ func main() {
 
 	repo, err := video.NewFileRepository("tmp/videos.txt")
 	if err != nil {
-		fmt.Println("error initializing video repository")
+		log.Fatalln("error initializing video repository")
 	}
 
 	ids, err := repo.GetAll(context.Background())
 	if err != nil {
-		fmt.Printf("error fetching video IDs: %w\n", err)
+		log.Fatalf("error fetching video IDs: %v\n", err)
 	}
 
-	videos, err := videoAPI.GetInfo(context.Background(), ids)
-	if err != nil {
-		fmt.Printf("error getting video info: %w\n", err)
-	}
+	if len(ids) > 0 {
+		videos, err := videoAPI.GetInfo(context.Background(), ids)
+		if err != nil {
+			log.Fatalf("error getting video info: %v\n", err)
+		}
 
-	fmt.Println("# Videos")
+		fmt.Println("# Videos")
 
-	for _, v := range videos {
-		fmt.Printf(
-			"TITLE: %s\nTHUMB: %s\nCHANNEL: %s\nTAGS: %v\nDURATION: %s\n\n",
-			v.Title,
-			v.ThumbnailURL,
-			v.ChannelTitle,
-			v.Tags,
-			v.Duration,
-		)
+		for _, v := range videos {
+			fmt.Printf(
+				"TITLE: %s\nTHUMB: %s\nCHANNEL: %s\nTAGS: %v\nDURATION: %s\n\n",
+				v.Title,
+				v.ThumbnailURL,
+				v.ChannelTitle,
+				v.Tags,
+				v.Duration,
+			)
+		}
+	} else {
+		fmt.Println("No videos found!")
 	}
 }

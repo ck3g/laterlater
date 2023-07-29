@@ -3,6 +3,9 @@ package video
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"strings"
 )
 
 type Repository interface {
@@ -26,7 +29,12 @@ func NewFileRepository(filePath string) (*FileRepository, error) {
 func (fr *FileRepository) GetAll(ctx context.Context) ([]string, error) {
 	var items []string
 
-	items = []string{"FNnckb4rg5o", "CK5rLpZk5A8", "WQKPIOvt2Ac"}
+	content, err := ioutil.ReadFile(fr.filePath)
+	if err != nil {
+		return items, fmt.Errorf("error fetching videos: %w", err)
+	}
+
+	items = strings.Split(strings.TrimSpace(string(content)), "\n")
 
 	return items, nil
 }
