@@ -1,8 +1,47 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <title>Later Later: watch later</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <title>Later Later - watch later!</title>
   </head>
   <body>
-    <h1>Later Later: watch later</h1>
+    <nav class="container-fluid">
+      <ul>
+        <li>Later Later - watch later</li>
+      </ul>
+      <ul>
+        <li>
+          <button class="contrast" data-target="modal-example" onClick="toggleModal(event)"> + </button>
+        </li>
+      </ul>
+    </nav>
+    <main class="container-fluid">
+    </main>
+
+    <!-- Modal -->
+    <dialog id="modal-example">
+      <article>
+        <a href="#close" aria-label="Close" class="close" data-target="modal-example" onClick="toggleModal(event)"> </a>
+        <form>
+          <h3>Add videos to watch later</h3>
+          <p>
+            <textarea name="video" cols="100" rows="10" class="add-video"
+            placeholder="You can add one or several YouTube Video links.
+A link to a video can be one of the following formats:
+
+https://www.youtube.com/watch?v=12345678901
+https://youtu.be/12345678901
+12345678901
+            "></textarea>
+          </p>
+            <input type="submit" class="contrast" value="Submit" />
+        </form>
+      </article>
+    </dialog>
+
+    <script src="/static/js/modal.js"></script>
   </body>
 </html>

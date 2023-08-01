@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", homeHandler)
 
 	fmt.Println("Starting a web server on port 4000...")
