@@ -24,10 +24,12 @@ func main() {
 		log.Fatalln("error initializing video repository")
 	}
 
-	ids, err := repo.GetAll(context.Background())
+	ulrs, err := repo.GetAll(context.Background())
 	if err != nil {
-		log.Fatalf("error fetching video IDs: %v\n", err)
+		log.Fatalf("error fetching video urls: %v\n", err)
 	}
+
+	ids := video.ParseIDs(ulrs)
 
 	if len(ids) > 0 {
 		videos, err := videoAPI.GetInfo(context.Background(), ids)
