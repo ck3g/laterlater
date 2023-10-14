@@ -52,7 +52,7 @@ func (a YouTubeAPI) GetInfo(ctx context.Context, videoIDs []string) ([]Video, er
 			v := Video{
 				ID:           video.Id,
 				Title:        video.Snippet.Title,
-				ThumbnailURL: video.Snippet.Thumbnails.Default.Url,
+				ThumbnailURL: video.Snippet.Thumbnails.Medium.Url,
 				ChannelTitle: video.Snippet.ChannelTitle,
 				Tags:         video.Snippet.Tags,
 				Duration:     video.ContentDetails.Duration,

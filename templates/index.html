@@ -19,16 +19,23 @@
       </ul>
     </nav>
     <main class="container-fluid">
+      {{range .Videos}}
+        <div>
+          <div><img src="{{.ThumbnailURL}}" /></div>
+          <div>{{.Title}} ({{.Duration}})</div>
+          <div>{{.ChannelTitle}}</div>
+        </div>
+      {{end}}
     </main>
 
     <!-- Modal -->
     <dialog id="modal-example">
       <article>
         <a href="#close" aria-label="Close" class="close" data-target="modal-example" onClick="toggleModal(event)"> </a>
-        <form>
+        <form method="post" action="/videos">
           <h3>Add videos to watch later</h3>
           <p>
-            <textarea name="video" cols="100" rows="10" class="add-video"
+            <textarea name="videos" cols="100" rows="10" class="add-video"
             placeholder="You can add one or several YouTube Video links.
 A link to a video can be one of the following formats:
 
