@@ -1,3 +1,82 @@
 textarea.add-video {
   resize: none;
 }
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.video-container {
+  background-color: 'gray';
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  /* Minimum width of 300px, auto-wrap */
+  gap: 16px;
+  /* Add some gap between tiles for spacing */
+  padding: 16px;
+  /* Add padding to the grid container */
+}
+
+.video-tile {
+  overflow: hidden;
+  transition: transform 0.2s;
+  cursor: pointer;
+  background-color: #fff;
+  margin: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.video-tile:hover {
+  transform: scale(1.02);
+}
+
+.thumbnail-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.video-duration::after {
+  content: " ● ";
+}
+
+.video-duration::before {
+  content: "Duration: ";
+  display: none;
+}
+
+.video-tile img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  /* Add border radius to the image */
+}
+
+.video-info {
+  flex-grow: 1;
+  padding: 8px;
+}
+
+.video-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.channel-title {
+  font-size: 14px;
+  color: #555;
+}
