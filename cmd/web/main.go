@@ -85,14 +85,19 @@ func createVideosHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Read value from "videos" body param
 	err := r.ParseForm()
-	videos := r.FormValue("videos")
+	videosInput := r.FormValue("videos")
 	if err != nil {
 		http.Error(w, "Something went wrong. Please try again later.", http.StatusInternalServerError)
 		return
 	}
 
-	// add received videos to allVideos slice
-	allVideos = append(allVideos, strings.Split(videos, ",")...)
+	videos := strings.Split(videosInput, "\n")
+
+	for i, video := range videos {
+		videos[i] = strings.TrimSpace(video)
+	}
+
+	allVideos = append(allVideos, videos...)
 
 	// redirect to home page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
