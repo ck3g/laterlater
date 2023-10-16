@@ -18,6 +18,12 @@ var ytClient video.YouTubeAPI
 var allVideos = []string{
 	"https://www.youtube.com/watch?v=Cs2j-Rjqg94",
 	"https://www.youtube.com/watch?v=dJIUxvfSg6A",
+	"https://www.youtube.com/watch?v=5EYl1TkJSZY",
+	"https://www.youtube.com/watch?v=Lwr3-doAgaI",
+	"https://www.youtube.com/watch?v=kWfP4H1qzCk",
+	"https://www.youtube.com/watch?v=6FY9urgIjqo",
+	"https://www.youtube.com/watch?v=IWDlVSSdKC8",
+	"https://www.youtube.com/watch?v=Ztk9d78HgC0",
 }
 
 func main() {

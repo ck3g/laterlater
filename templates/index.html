@@ -19,13 +19,20 @@
       </ul>
     </nav>
     <main class="container-fluid">
-      {{range .Videos}}
-        <div>
-          <div><img src="{{.ThumbnailURL}}" /></div>
-          <div>{{.Title}} ({{.Duration}})</div>
-          <div>{{.ChannelTitle}}</div>
-        </div>
-      {{end}}
+      <div class="video-container">
+        {{range .Videos}}
+          <div class="video-tile">
+            <div class="thumbnail-container">
+              <img src="{{.ThumbnailURL}}" />
+              <span class="video-duration">{{.Duration}}</span>
+            </div>
+            <div class="video-info">
+              <div class="video-title">{{.Title}}</div>
+              <div class="channel-title">{{.ChannelTitle}}</div>
+            </div>
+          </div>
+        {{end}}
+      </div>
     </main>
 
     <!-- Modal -->
@@ -42,7 +49,11 @@ A link to a video can be one of the following formats:
 https://www.youtube.com/watch?v=12345678901
 https://youtu.be/12345678901
 12345678901
-            "></textarea>
+            ">
+            https://www.youtube.com/watch?v=z75DKfOfDA4
+            https://www.youtube.com/watch?v=qyM8Pi1KiiM
+            https://www.youtube.com/watch?v=m4jJsseY2Ic
+            </textarea>
           </p>
             <input type="submit" class="contrast" value="Submit" />
         </form>
