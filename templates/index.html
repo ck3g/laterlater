@@ -22,14 +22,16 @@
       <div class="video-container">
         {{range .Videos}}
           <div class="video-tile">
-            <div class="thumbnail-container">
-              <img src="{{.ThumbnailURL}}" />
-              <span class="video-duration">{{.Duration}}</span>
-            </div>
-            <div class="video-info">
-              <div class="video-title">{{.Title}}</div>
-              <div class="channel-title">{{.ChannelTitle}}</div>
-            </div>
+            <a href="https://www.youtube.com/watch?v={{.ID}}" target="_blank">
+              <div class="thumbnail-container">
+                <img src="{{.ThumbnailURL}}" />
+                <span class="video-duration">{{.Duration}}</span>
+              </div>
+              <div class="video-info">
+                <div class="video-title">{{.Title}}</div>
+                <div class="channel-title">{{.ChannelTitle}}</div>
+              </div>
+            </a>
           </div>
         {{end}}
       </div>

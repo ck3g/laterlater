@@ -29,8 +29,18 @@ body {
   position: relative;
 }
 
+.video-tile a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .video-tile:hover {
   transform: scale(1.02);
+}
+
+.video-tile a:hover {
+  text-decoration: none;
+  color: inherit;
 }
 
 .thumbnail-container {
