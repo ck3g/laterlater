@@ -77,13 +77,41 @@ body {
 }
 
 .video-info {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
-  padding: 8px;
+  padding-top: 10px;
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ellipsis-button {
+  display: none;
+  /* Initially hidden */
+  cursor: pointer;
+  padding-right: 6px;
+}
+
+.ellipsis-button .dot {
+  width: 4px;
+  height: 4px;
+  background-color: #666;
+  border-radius: 50%;
+  margin: 2px 0;
 }
 
 .video-title {
   font-size: 16px;
   font-weight: bold;
+}
+
+.video-tile:hover .ellipsis-button {
+  display: block;
+  /* Display on hover */
 }
 
 .channel-title {
