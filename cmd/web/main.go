@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,17 +12,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var ytClient video.YouTubeAPI
-
-var allVideos = []string{
-	"https://www.youtube.com/watch?v=Cs2j-Rjqg94",
-	"https://www.youtube.com/watch?v=dJIUxvfSg6A",
-	"https://www.youtube.com/watch?v=5EYl1TkJSZY",
-	"https://www.youtube.com/watch?v=Lwr3-doAgaI",
-	"https://www.youtube.com/watch?v=kWfP4H1qzCk",
-	"https://www.youtube.com/watch?v=6FY9urgIjqo",
-	"https://www.youtube.com/watch?v=IWDlVSSdKC8",
-	"https://www.youtube.com/watch?v=Ztk9d78HgC0",
+type Application struct {
+	Repository video.Repository
+	YTClient   video.YouTubeAPI
 }
 
 func main() {
@@ -32,7 +23,13 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	ytClient = video.NewYouTubeAPI(os.Getenv("API_KEY"))
+	repo, _ := video.NewInMemoryRepository()
+	ytClient := video.NewYouTubeAPI(os.Getenv("API_KEY"))
+
+	a := Application{
+		Repository: repo,
+		YTClient:   ytClient,
+	}
 
 	viewsEngine := html.New("./templates", ".html")
 	app := fiber.New(fiber.Config{
@@ -40,9 +37,9 @@ func main() {
 	})
 	app.Static("/static", "./static")
 
-	app.Get("/", homeHandler)
-	app.Post("/videos", createVideosHandler)
-	app.Delete("/videos/:id", deleteVideoHandler)
+	app.Get("/", a.HomeHandler)
+	app.Post("/videos", a.CreateVideosHandler)
+	app.Delete("/videos/:id", a.DeleteVideoHandler)
 
 	err = app.Listen(":4000")
 	if err != nil {
@@ -50,9 +47,10 @@ func main() {
 	}
 }
 
-func homeHandler(c *fiber.Ctx) error {
+func (a *Application) HomeHandler(c *fiber.Ctx) error {
+	allVideos, _ := a.Repository.GetAll(c.Context())
 	videoIDs := video.ParseIDs(allVideos)
-	videos, err := ytClient.GetInfo(c.Context(), videoIDs)
+	videos, err := a.YTClient.GetInfo(c.Context(), videoIDs)
 	if err != nil {
 		log.Println(err)
 		return fiber.ErrInternalServerError
@@ -64,7 +62,7 @@ func homeHandler(c *fiber.Ctx) error {
 }
 
 // POST handler to create videos
-func createVideosHandler(c *fiber.Ctx) error {
+func (a *Application) CreateVideosHandler(c *fiber.Ctx) error {
 	videosInput := c.FormValue("videos")
 
 	videos := strings.Split(videosInput, "\n")
@@ -73,20 +71,15 @@ func createVideosHandler(c *fiber.Ctx) error {
 		videos[i] = strings.TrimSpace(video)
 	}
 
-	allVideos = append(allVideos, videos...)
+	a.Repository.Create(c.Context(), videos)
 
 	return c.Redirect("/", http.StatusSeeOther)
 }
 
-func deleteVideoHandler(c *fiber.Ctx) error {
+func (a *Application) DeleteVideoHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	for i, video := range allVideos {
-		if video == fmt.Sprintf("https://www.youtube.com/watch?v=%s", id) {
-			allVideos = append(allVideos[:i], allVideos[i+1:]...)
-			break
-		}
-	}
+	a.Repository.Delete(c.Context(), id)
 
 	return c.JSON(fiber.Map{"result": "ok"})
 }
