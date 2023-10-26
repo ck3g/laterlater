@@ -1,15 +1,14 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
-	"text/template"
 
 	"github.com/ck3g/laterlater/internal/video"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 )
 
@@ -34,62 +33,37 @@ func main() {
 
 	ytClient = video.NewYouTubeAPI(os.Getenv("API_KEY"))
 
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/videos", createVideosHandler)
+	viewsEngine := html.New("./templates", ".html")
+	app := fiber.New(fiber.Config{
+		Views: viewsEngine,
+	})
+	app.Static("/static", "./static")
 
-	fmt.Println("Starting a web server on port 4000...")
-	err = http.ListenAndServe(":4000", nil)
+	app.Get("/", homeHandler)
+	app.Post("/videos", createVideosHandler)
+
+	err = app.Listen(":4000")
 	if err != nil {
 		log.Panic("Error starting a web server: ", err)
 	}
 }
 
-type HomePageData struct {
-	Videos []video.Video
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./templates/index.html")
-	if err != nil {
-		http.Error(w, "Something went wrong. Please try again later.", http.StatusInternalServerError)
-		return
-	}
-
+func homeHandler(c *fiber.Ctx) error {
 	videoIDs := video.ParseIDs(allVideos)
-	videos, err := ytClient.GetInfo(context.Background(), videoIDs)
+	videos, err := ytClient.GetInfo(c.Context(), videoIDs)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "Something went wrong. Please try again later.", http.StatusInternalServerError)
-		return
+		return fiber.ErrInternalServerError
 	}
 
-	data := HomePageData{
-		Videos: videos,
-	}
-
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Something went wrong. Please try again later.", http.StatusInternalServerError)
-		return
-	}
+	return c.Render("index", fiber.Map{
+		"Videos": videos,
+	})
 }
 
 // POST handler to create videos
-func createVideosHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method is not supported.", http.StatusBadRequest)
-		return
-	}
-
-	// Read value from "videos" body param
-	err := r.ParseForm()
-	videosInput := r.FormValue("videos")
-	if err != nil {
-		http.Error(w, "Something went wrong. Please try again later.", http.StatusInternalServerError)
-		return
-	}
+func createVideosHandler(c *fiber.Ctx) error {
+	videosInput := c.FormValue("videos")
 
 	videos := strings.Split(videosInput, "\n")
 
@@ -99,6 +73,5 @@ func createVideosHandler(w http.ResponseWriter, r *http.Request) {
 
 	allVideos = append(allVideos, videos...)
 
-	// redirect to home page
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return c.Redirect("/", http.StatusSeeOther)
 }
