@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -41,6 +42,7 @@ func main() {
 
 	app.Get("/", homeHandler)
 	app.Post("/videos", createVideosHandler)
+	app.Delete("/videos/:id", deleteVideoHandler)
 
 	err = app.Listen(":4000")
 	if err != nil {
@@ -74,4 +76,17 @@ func createVideosHandler(c *fiber.Ctx) error {
 	allVideos = append(allVideos, videos...)
 
 	return c.Redirect("/", http.StatusSeeOther)
+}
+
+func deleteVideoHandler(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	for i, video := range allVideos {
+		if video == fmt.Sprintf("https://www.youtube.com/watch?v=%s", id) {
+			allVideos = append(allVideos[:i], allVideos[i+1:]...)
+			break
+		}
+	}
+
+	return c.JSON(fiber.Map{"result": "ok"})
 }

@@ -38,7 +38,13 @@
             </div>
             <div class="control-buttons">
               {{/* <button class="mark-as-viewed outline">Mark as Viewed</button> */}}
-              <button hx-delete="/video/{{.ID}}" class="remove-button outline danger">Remove</button>
+              <button
+                hx-delete="/videos/{{.ID}}"
+                hx-target="#video-{{.ID}}"
+                hx-swap="delete"
+                class="remove-button outline danger">
+                Remove
+              </button>
             </div>
           </div>
         {{end}}
@@ -70,6 +76,7 @@ https://youtu.be/12345678901
       </article>
     </dialog>
 
+    <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
     <script src="/static/js/modal.js"></script>
   </body>
 </html>
