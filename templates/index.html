@@ -21,7 +21,7 @@
     <main class="container-fluid">
       <div class="video-container">
         {{range .Videos}}
-          <div class="video-tile">
+          <div class="video-tile" id="video-{{.ID}}">
             <a href="https://www.youtube.com/watch?v={{.ID}}" target="_blank">
               <div class="thumbnail-container">
                 <img src="{{.ThumbnailURL}}" />
@@ -38,7 +38,7 @@
             </div>
             <div class="control-buttons">
               {{/* <button class="mark-as-viewed outline">Mark as Viewed</button> */}}
-              <button class="remove-button outline danger">Remove</button>
+              <button hx-delete="/video/{{.ID}}" class="remove-button outline danger">Remove</button>
             </div>
           </div>
         {{end}}
