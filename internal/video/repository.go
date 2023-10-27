@@ -22,6 +22,7 @@ type InMemoryRepository struct {
 func NewInMemoryRepository() (*InMemoryRepository, error) {
 	return &InMemoryRepository{
 		videos: []string{
+			"https://www.youtube.com/watch?v=i7ABlHngi1Q",
 			"https://www.youtube.com/watch?v=Cs2j-Rjqg94",
 			"https://www.youtube.com/watch?v=dJIUxvfSg6A",
 			"https://www.youtube.com/watch?v=5EYl1TkJSZY",
