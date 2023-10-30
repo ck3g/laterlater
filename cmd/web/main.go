@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ck3g/laterlater/internal/storage"
+	inmemorystorage "github.com/ck3g/laterlater/internal/storage/inmemory"
 	"github.com/ck3g/laterlater/internal/video"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
@@ -17,8 +19,8 @@ import (
 )
 
 type Application struct {
-	Repository video.Repository
-	YTClient   video.YouTubeAPI
+	Storage  storage.Storage
+	YTClient video.YouTubeAPI
 }
 
 func main() {
@@ -34,12 +36,32 @@ func main() {
 		}
 	}()
 
-	repo, _ := video.NewInMemoryRepository()
+	videoStorage := inmemorystorage.NewInmemoryVideoStorage()
 	ytClient := video.NewYouTubeAPI(os.Getenv("API_KEY"))
+	videoIDs := []string{
+		"https://www.youtube.com/watch?v=i7ABlHngi1Q",
+		"https://www.youtube.com/watch?v=Cs2j-Rjqg94",
+		"https://www.youtube.com/watch?v=dJIUxvfSg6A",
+		"https://www.youtube.com/watch?v=5EYl1TkJSZY",
+		"https://www.youtube.com/watch?v=Lwr3-doAgaI",
+		"https://www.youtube.com/watch?v=kWfP4H1qzCk",
+		"https://www.youtube.com/watch?v=6FY9urgIjqo",
+		"https://www.youtube.com/watch?v=IWDlVSSdKC8",
+		"https://www.youtube.com/watch?v=Ztk9d78HgC0",
+	}
+	videoIDs = video.ParseIDs(videoIDs)
+	videos, err := ytClient.GetInfo(context.TODO(), videoIDs)
+	if err != nil {
+		log.Panic("Error parsing initial video list", err)
+	}
+
+	videoStorage.Create(context.TODO(), videos)
 
 	a := Application{
-		Repository: repo,
-		YTClient:   ytClient,
+		Storage: storage.Storage{
+			Videos: videoStorage,
+		},
+		YTClient: ytClient,
 	}
 
 	viewsEngine := html.New("./templates", ".html")
@@ -58,6 +80,7 @@ func main() {
 	}
 }
 
+// TODO: rename/move to db.Init
 func connectToMongoDB(uri string) *mongo.Client {
 	// Use the SetServerAPIOptions() method to set the Stable API version to 1
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
@@ -81,9 +104,7 @@ func connectToMongoDB(uri string) *mongo.Client {
 }
 
 func (a *Application) HomeHandler(c *fiber.Ctx) error {
-	allVideos, _ := a.Repository.GetAll(c.Context())
-	videoIDs := video.ParseIDs(allVideos)
-	videos, err := a.YTClient.GetInfo(c.Context(), videoIDs)
+	videos, err := a.Storage.Videos.GetAll(c.Context())
 	if err != nil {
 		log.Println(err)
 		return fiber.ErrInternalServerError
@@ -98,13 +119,20 @@ func (a *Application) HomeHandler(c *fiber.Ctx) error {
 func (a *Application) CreateVideosHandler(c *fiber.Ctx) error {
 	videosInput := c.FormValue("videos")
 
-	videos := strings.Split(videosInput, "\n")
+	videoIDs := strings.Split(videosInput, "\n")
 
-	for i, video := range videos {
-		videos[i] = strings.TrimSpace(video)
+	for i, videoID := range videoIDs {
+		videoIDs[i] = strings.TrimSpace(videoID)
 	}
 
-	a.Repository.Create(c.Context(), videos)
+	videoIDs = video.ParseIDs(videoIDs)
+	videos, err := a.YTClient.GetInfo(c.Context(), videoIDs)
+	if err != nil {
+		log.Println(err)
+		return fiber.ErrInternalServerError
+	}
+
+	a.Storage.Videos.Create(c.Context(), videos)
 
 	return c.Redirect("/", http.StatusSeeOther)
 }
@@ -112,7 +140,7 @@ func (a *Application) CreateVideosHandler(c *fiber.Ctx) error {
 func (a *Application) DeleteVideoHandler(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	a.Repository.Delete(c.Context(), id)
+	a.Storage.Videos.Delete(c.Context(), id)
 
 	return c.JSON(fiber.Map{"result": "ok"})
 }
