@@ -19,7 +19,6 @@ func main() {
 	apiKey := os.Getenv("API_KEY")
 	videoAPI := video.NewYouTubeAPI(apiKey)
 
-	// repo, err := video.NewFileRepository("tmp/videos.txt")
 	repo, err := video.NewInMemoryRepository()
 	if err != nil {
 		log.Fatalln("error initializing video repository")

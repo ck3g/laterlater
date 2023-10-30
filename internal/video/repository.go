@@ -11,10 +11,6 @@ type Repository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type FileRepository struct {
-	filePath string
-}
-
 type InMemoryRepository struct {
 	videos []string
 }
@@ -58,26 +54,3 @@ func (r *InMemoryRepository) Delete(ctx context.Context, id string) error {
 
 	return nil
 }
-
-// func NewFileRepository(filePath string) (*FileRepository, error) {
-// 	if filePath == "" {
-// 		return nil, errors.New("filePath cannot be blank")
-// 	}
-
-// 	return &FileRepository{
-// 		filePath: filePath,
-// 	}, nil
-// }
-
-// func (fr *FileRepository) GetAll(ctx context.Context) ([]string, error) {
-// 	var items []string
-
-// 	content, err := ioutil.ReadFile(fr.filePath)
-// 	if err != nil {
-// 		return items, fmt.Errorf("error fetching videos: %w", err)
-// 	}
-
-// 	items = strings.Split(strings.TrimSpace(string(content)), "\n")
-
-// 	return items, nil
-// }
