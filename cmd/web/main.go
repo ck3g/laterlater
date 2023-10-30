@@ -8,12 +8,14 @@ import (
 	"strings"
 
 	"github.com/ck3g/laterlater/internal/storage"
-	inmemorystorage "github.com/ck3g/laterlater/internal/storage/inmemory"
+	mongostorage "github.com/ck3g/laterlater/internal/storage/mongo"
 	"github.com/ck3g/laterlater/internal/video"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 )
+
+const dbName = "laterlater"
 
 type Application struct {
 	Storage  storage.Storage
@@ -33,7 +35,11 @@ func main() {
 		}
 	}()
 
-	videoStorage := inmemorystorage.NewInmemoryVideoStorage()
+	// videoStorage := inmemorystorage.NewInmemoryVideoStorage()
+	videoStorage, err := mongostorage.NewVideoStorage(client, dbName)
+	if err != nil {
+		log.Panic("error creating new video storage: ", err)
+	}
 	ytClient := video.NewYouTubeAPI(os.Getenv("API_KEY"))
 	videoIDs := []string{
 		"https://www.youtube.com/watch?v=i7ABlHngi1Q",

@@ -6,12 +6,12 @@ import (
 )
 
 type Video struct {
-	ID           string
-	Title        string
-	ThumbnailURL string
-	ChannelTitle string
-	Tags         []string
-	Duration     string // ISO 8601 https://en.wikipedia.org/wiki/ISO_8601#Durations
+	ID           string   `bson:"video_id"`
+	Title        string   `bson:"title"`
+	ThumbnailURL string   `bson:"thumbnail_url"`
+	ChannelTitle string   `bson:"channel_title"`
+	Tags         []string `bson:"tags"`
+	Duration     string   `bson:"duration"` // ISO 8601 https://en.wikipedia.org/wiki/ISO_8601#Durations
 }
 
 // ParseID returns the YouTube video ID from the given URL.
