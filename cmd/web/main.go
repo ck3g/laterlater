@@ -13,9 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Application struct {
@@ -29,7 +26,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	client := connectToMongoDB(os.Getenv("MONGO_URI"))
+	client := storage.InitMongoDB(os.Getenv("MONGO_URI"))
 	defer func() {
 		if err = client.Disconnect(context.TODO()); err != nil {
 			panic(err)
@@ -78,29 +75,6 @@ func main() {
 	if err != nil {
 		log.Panic("Error starting a web server: ", err)
 	}
-}
-
-// TODO: rename/move to db.Init
-func connectToMongoDB(uri string) *mongo.Client {
-	// Use the SetServerAPIOptions() method to set the Stable API version to 1
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
-
-	// Create a new client and connect to the server
-	client, err := mongo.Connect(context.TODO(), opts)
-	if err != nil {
-		panic(err)
-	}
-
-	// Send a ping to confirm a successful connection
-	var result bson.M
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Decode(&result); err != nil {
-		panic(err)
-	}
-
-	log.Println("Pinged your deployment. You successfully connected to MongoDB!")
-
-	return client
 }
 
 func (a *Application) HomeHandler(c *fiber.Ctx) error {
