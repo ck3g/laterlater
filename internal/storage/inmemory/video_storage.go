@@ -6,27 +6,27 @@ import (
 	"github.com/ck3g/laterlater/internal/video"
 )
 
-type InmemoryVideoStorage struct {
+type VideoStorage struct {
 	videos []video.Video
 }
 
-func NewInmemoryVideoStorage() *InmemoryVideoStorage {
-	return &InmemoryVideoStorage{
+func NewVideoStorage() *VideoStorage {
+	return &VideoStorage{
 		videos: []video.Video{},
 	}
 }
 
-func (s *InmemoryVideoStorage) GetAll(ctx context.Context) ([]video.Video, error) {
+func (s *VideoStorage) GetAll(ctx context.Context) ([]video.Video, error) {
 	return s.videos, nil
 }
 
-func (s *InmemoryVideoStorage) Create(ctx context.Context, videos []video.Video) error {
+func (s *VideoStorage) Create(ctx context.Context, videos []video.Video) error {
 	s.videos = append(s.videos, videos...)
 
 	return nil
 }
 
-func (s *InmemoryVideoStorage) Delete(ctx context.Context, id string) error {
+func (s *VideoStorage) Delete(ctx context.Context, id string) error {
 	parsedID := video.ParseID(id)
 
 	for i, v := range s.videos {

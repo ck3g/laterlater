@@ -6,10 +6,12 @@ import (
 	"log"
 	"os"
 
-	inmemorystorage "github.com/ck3g/laterlater/internal/storage/inmemory"
-	"github.com/ck3g/laterlater/internal/video"
+	"github.com/ck3g/laterlater/internal/storage"
+	mongostorage "github.com/ck3g/laterlater/internal/storage/mongo"
 	"github.com/joho/godotenv"
 )
+
+const dbName = "laterlater"
 
 func main() {
 	err := godotenv.Load()
@@ -17,30 +19,19 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	apiKey := os.Getenv("API_KEY")
-	videoAPI := video.NewYouTubeAPI(apiKey)
+	client := storage.InitMongoDB(os.Getenv("MONGO_URI"))
+	defer func() {
+		if err = client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
 
-	videoIDs := []string{
-		"https://www.youtube.com/watch?v=i7ABlHngi1Q",
-		"https://www.youtube.com/watch?v=Cs2j-Rjqg94",
-		"https://www.youtube.com/watch?v=dJIUxvfSg6A",
-		"https://www.youtube.com/watch?v=5EYl1TkJSZY",
-		"https://www.youtube.com/watch?v=Lwr3-doAgaI",
-		"https://www.youtube.com/watch?v=kWfP4H1qzCk",
-		"https://www.youtube.com/watch?v=6FY9urgIjqo",
-		"https://www.youtube.com/watch?v=IWDlVSSdKC8",
-		"https://www.youtube.com/watch?v=Ztk9d78HgC0",
-	}
-	videoIDs = video.ParseIDs(videoIDs)
-	videos, err := videoAPI.GetInfo(context.TODO(), videoIDs)
+	videoStorage, err := mongostorage.NewVideoStorage(client, dbName)
 	if err != nil {
-		log.Panic("Error parsing initial video list", err)
+		log.Panic("error creating new video storage: ", err)
 	}
 
-	videoStorage := inmemorystorage.NewInmemoryVideoStorage()
-	videoStorage.Create(context.TODO(), videos)
-
-	videos, err = videoStorage.GetAll(context.Background())
+	videos, err := videoStorage.GetAll(context.Background())
 	if err != nil {
 		log.Fatalf("error fetching video urls: %v\n", err)
 	}
