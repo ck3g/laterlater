@@ -35,7 +35,6 @@ func main() {
 		}
 	}()
 
-	// videoStorage := inmemorystorage.NewInmemoryVideoStorage()
 	videoStorage, err := mongostorage.NewVideoStorage(client, dbName)
 	if err != nil {
 		log.Panic("error creating new video storage: ", err)
