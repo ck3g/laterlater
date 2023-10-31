@@ -49,3 +49,28 @@ func TestParseIDs(t *testing.T) {
 		t.Errorf("parseIDs(%v) = %v; want %v", input, got, want)
 	}
 }
+
+func TestDurationToHuman(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"valid duration", "PT59M30S", "59:30"},
+		{"valid duration with hours", "PT5H20M37S", "5:20:37"},
+		{"valid duration with days", "P1DT51M37S", "1:00:51:37"},
+		{"valid duration without minutes", "PT7H50S", "7:00:50"},
+		{"valid duration without seconds", "PT22M", "22:00"},
+		{"invalid duration", "1H1M1S", "1H1M1S"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := Video{Duration: tt.input}
+			got := v.DurationToHuman()
+			if got != tt.want {
+				t.Errorf("durationToHuman(%s) = %s; want %s", tt.input, got, tt.want)
+			}
+		})
+	}
+}

@@ -56,3 +56,36 @@ func ParseIDs(input []string) []string {
 
 	return ids
 }
+
+func (v Video) URL() string {
+	return "https://www.youtube.com/watch?v=" + v.ID
+}
+
+func (v Video) DurationToHuman() string {
+	iso8601Regex := regexp.MustCompile(`^P(\d+Y)?(\d+M)?(\d+D)?T?(\d+H)?(\d+M)?(\d+S)?$`)
+
+	match := iso8601Regex.FindStringSubmatch(v.Duration)
+	if match == nil {
+		return v.Duration
+	}
+
+	days := strings.TrimSuffix(match[3], "D")
+	hours := strings.TrimSuffix(match[4], "H")
+	minutes := strings.TrimSuffix(match[5], "M")
+	seconds := strings.TrimSuffix(match[6], "S")
+
+	parts := make([]string, 0, 4)
+	firstValue := true
+	for _, s := range []string{days, hours, minutes, seconds} {
+		if s == "" {
+			if !firstValue {
+				parts = append(parts, "00")
+			}
+		} else {
+			parts = append(parts, s)
+			firstValue = false
+		}
+	}
+
+	return strings.Join(parts, ":")
+}
